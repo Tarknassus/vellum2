@@ -1,0 +1,42 @@
+name = "Vellum2"
+license = "MIT"
+licenselink = "https://github.com/tarknassus/vellum2/blob/main/LICENSE"
+description = "A Hugo theme that uses engineering drawing sheets as an inspiration."
+homepage = "https://github.com/tarknassus/vellum2"
+demosite = "https://pages.stkn.org/felix/vellum2"
+tags = ["blog", "technical", "documentation", "light", "dark", "search", "personal", "responsive"]
+features = [
+  "responsive",
+  "blog",
+  "profile-page",
+  "social-icons",
+  "theme-toggle",
+  "table-of-contents",
+  "code-copy",
+  "search",
+  "tags",
+  "archives",
+  "breadcrumbs",
+  "cover-images",
+  "share-buttons",
+  "edit-post-link",
+  "shortcodes",
+  "reading-time",
+  "word-count",
+  "post-nav-links",
+  "responsive-images",
+  "self-hosted-fonts",
+  "print-stylesheet",
+  "opengraph",
+  "twitter-cards",
+  "schema",
+  "rss",
+  "minified-assets",
+  "subresource-integrity",
+]
+# min_version kept as original claimed for 'older tooling'
+min_version = "0.158.0"
+
+[author]
+  name = "Richard Cheesman"
+  homepage = "https://github.com/tarknassus"
