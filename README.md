@@ -1,4 +1,4 @@
-# Vellum^2^
+# vellum2
 
 *Adapted from the theme Vellum by [Cebor](https://github.com/cebor).  Sorry, but the 'attention to detail' part made me lol as there's a ton of waste and unecessary duplication in this theme, nice as it looks.*
 
