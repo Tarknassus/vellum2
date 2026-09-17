@@ -1,0 +1,12 @@
+{{- if and ($.Param "ShowBreadCrumbs") .Ancestors }}
+    <nav class="breadcrumbs" aria-label="{{ i18n "breadcrumb" }}">
+        <ol class="breadcrumbsList">
+        {{- range .Ancestors.Reverse }}
+            <li class="breadcrumbsItem">
+                <a href="{{ .RelPermalink }}">{{ if .IsHome }}{{ "Home" }}{{ else }}{{ .LinkTitle }}{{ end }}</a>
+            </li>
+        {{- end }}
+        <li class="breadcrumbsItem breadcrumbsItem--current" aria-current="page">{{ .LinkTitle }}</li>
+        </ol>
+    </nav>
+{{- end }}

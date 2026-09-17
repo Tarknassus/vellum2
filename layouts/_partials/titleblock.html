@@ -1,0 +1,87 @@
+{{- $rows := slice }}
+
+{{- if not .Date.IsZero }}
+{{ if eq .Section "music" }}
+    {{- $rows = $rows | append (dict
+        "label" ("Released")
+        "value" (printf `<time datetime="%s" title="%s">%s</time>`
+            (.Date.Format "2006-01-02T15:04:05Z07:00") (.Date)
+            (.Date | time.Format (site.Params.DateFormat | default ":date_long") ))) }}
+    
+{{ else }}
+    {{- $rows = $rows | append (dict
+        "label" ("Published")
+        "value" (printf `<time datetime="%s" title="%s">%s</time>`
+            (.Date.Format "2006-01-02T15:04:05Z07:00") (.Date)
+            (.Date | time.Format (site.Params.DateFormat | default ":date_long") ))) }}
+    {{- end }}
+{{ end }}
+
+{{- if and (not .Lastmod.IsZero) (not .Date.IsZero) (gt (.Lastmod.Sub .Date).Hours 24.0) }}
+{{- $rows = $rows | append (dict
+    "label" ("Updated")
+    "value" (printf `<time datetime="%s">%s</time>`
+        (.Lastmod.Format "2006-01-02T15:04:05Z07:00")
+        (.Lastmod | time.Format (site.Params.DateFormat | default ":date_long")))) }}
+{{- end }}
+
+
+{{ if eq .Section "music" }}
+{{ if .Params.releasetype }}
+{{- $rows = $rows | append (dict
+    "label" ("Release Type")
+    "value" ((.Params.releasetype))) }}
+{{- end }}
+{{ if .Params.trackcount }}
+{{- $rows = $rows | append (dict
+    "label" ("Track Count")
+    "value" ((.Params.trackcount))) }}
+{{- end }}
+{{ if .Params.trackcount }}
+{{- $rows = $rows | append (dict
+    "label" ("Runtime")
+    "value" ((.Params.runtime))) }}
+{{- end }}
+
+
+{{ else }}
+{{- $scale := slice }}
+{{- if and (.Param "ShowWordCount") (gt .WordCount 0) }}
+{{ $wordCount := (printf "%d words" .WordCount) }}
+{{- $scale = $scale | append ($wordCount) }}
+{{- end }}
+{{ $readTime := (printf "±%d min read" .ReadingTime)}}
+{{- $scale = $scale | append ($readTime) }}
+
+{{- with $scale }}
+{{- $rows = $rows | append (dict "label" ("Specification") "value" (delimit . " / ")) }}
+{{- end }}
+{{ end}}
+
+{{- $tags := .GetTerms "tags" }}
+{{- with $tags }}
+{{- $links := slice }}
+{{- range . }}
+{{- $links = $links | append (printf `<a href="%s">%s</a>` .RelPermalink .LinkTitle) }}
+{{- end }}
+{{- $rows = $rows | append (dict "label" ("Tagged") "value" (delimit $links " / ")) }}
+{{- end }}
+
+{{- if or $rows .Draft }}
+<dl class="titleBlock">
+    {{- range $rows }}
+    <div class="titleBlockRow">
+        <dt class="titleBlockLabel">{{ .label }}</dt>
+        <dd class="titleBlockValue">{{ .value | safeHTML }}</dd>
+    </div>
+    {{- end }}
+    {{- if $.Draft }}
+    <div class="titleBlockRow titleBlockRowFlag">
+        <dt class="titleBlockLabel">{{ "Status" }}</dt>
+        <dd class="titleBlockValue"><span class="draft-badge">{{"Draft Copy" }}</span></dd>
+    </div>
+    {{ else }}
+    {{- end }}
+</dl>
+<br />
+{{- end }}

@@ -1,0 +1,65 @@
+{{- $dest := .Destination -}}
+{{- $class := .Attributes.class -}}
+{{- $link := .Attributes.link -}}
+
+{{- if (strings.Contains .Title "#") -}}
+{{- $parts := split .Title "#" -}}
+{{- .Page.Scratch.Set "title" (index $parts 0) -}}
+{{- $fragment := (index $parts 1) -}}
+{{- if (strings.Contains $fragment "|") -}}
+{{- $fragParts := split $fragment "|" -}}
+{{- $class = (index $fragParts 0) -}}
+{{- $link = (index $fragParts 1) -}}
+{{- else -}}
+{{- $class = $fragment -}}
+{{- end -}}
+{{- else -}}
+{{- .Page.Scratch.Set "title" .Title -}}
+{{- end -}}
+{{- $title := .Page.Scratch.Get "title" -}}
+
+{{- $img := .Page.Resources.GetMatch $dest -}}
+{{- if not $img -}}
+{{- $img = resources.Get $dest -}}
+{{- end -}}
+
+<figure>
+{{- if $img -}}
+{{- $processed := $img -}}
+    {{- if $link -}}
+    <a href="{{ $link | safeURL }}">
+    {{- end -}}
+    <img src="{{ $processed.RelPermalink }}"
+         width="{{ $processed.Width }}"
+         height="{{ $processed.Height }}"
+         {{ with .Text }}alt="{{ . }}" {{ else }}alt="" {{ end }}
+         {{ with $title }}title="{{ . }}" {{ end }}
+         {{ with $class }}class="{{ . }}" {{ end }}
+         loading="lazy"
+         decoding="async"
+    >
+    {{- if $link -}}
+    </a>
+    {{- end -}}
+{{- else -}}
+    {{- if $link -}}
+    <a href="{{ $link | safeURL }}">
+    {{- end -}}
+    <img src="{{ $dest | safeURL }}"
+         {{ with .Text }}alt="{{ . }}" {{ else }}alt="" {{ end }}
+         {{ with $title }}title="{{ . }}" {{ end }}
+         {{ with $class }}class="{{ . }}" {{ end }}
+         loading="lazy"
+         decoding="async"
+    >
+    {{- if $link -}}
+    </a>
+    {{- end -}}
+{{- end -}}
+
+{{ with .Text }}
+    <figcaption>
+        {{ . }}
+    </figcaption>
+{{ end }}
+</figure>

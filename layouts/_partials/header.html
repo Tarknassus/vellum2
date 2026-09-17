@@ -1,0 +1,22 @@
+<header class="header">
+    <div class="headerInner">
+        <a class="headerBrand" href="/">
+            <span class="headerLabel">{{ .Site.Title}}</span>
+        </a>
+        <nav class="nav" aria-label="Primary">
+            {{- range site.Menus.main }}
+                <a href="{{ .URL }}" class="navItem">
+                    {{ .Name }}
+                    {{- with .Page }}
+                        {{- with .Params.version -}}
+                        ({{ . }})
+                        {{- end }}
+                    {{- end }}
+                </a>
+            {{- end }}
+        </nav>
+        <div class="headerControls">
+            <span class="headerRule" aria-hidden="true"></span>
+        </div>
+    </div>
+</header>

@@ -1,0 +1,97 @@
+{{ define "main" }}
+
+
+<article class="post">
+    <header class="postHeader">
+        {{- if and ($.Param "ShowBreadCrumbs") .Ancestors }}
+            {{ partial "breadcrumbs.html" . }}
+        {{- end }}
+
+        <div class="postTitleRow">
+{{- $isPost := and .Section (ne .Layout "search") }}
+
+            <h1 class="postTitle">
+                {{ .Title }}
+                {{ if ne .Lastmod .Date }}
+                    {{ $currentTime := (time now) }}
+                    {{ $delta := $currentTime.Sub (time .Lastmod ) }}
+                    {{ if lt $delta.Hours 730 }}
+                        <span class="new-content">New Article</span>
+                    {{ end }}
+                {{ else }}
+                    {{ $currentTime := (time now) }}
+                    {{ $delta := $currentTime.Sub (time .Date ) }}
+                    {{ if lt $delta.Hours 730 }}
+                        <span class="new-content">New Article</span>
+                    {{ end }}
+                {{ end }}
+            </h1>
+        </div>
+
+        {{- with .Description }}
+        <p class="postStandFirst">{{ . | markdownify }}</p>
+        {{- end }}
+
+        {{- if not (.Param "hidemeta") }}
+        {{- partial "titleblock.html" . }}
+        {{- end }}
+    </header>
+
+    <!-- COVER WAS HERE.  MAY NEED TO REFER TO render-image.html -->
+
+    {{- if and (ne (.Param "toc") false) (ne (.Param "ShowToc") false) (ge (len .Fragments.Identifiers) 2) }}
+    <details class="toc"{{ if ne (.Param "TocOpen") false }} closed{{ end }}>
+        <summary class="tocSummary">Table of Contents</summary>
+        <div class="tocBody">{{ replace .TableOfContents "<nav id=\"TableOfContents\">" (printf "<nav id=\"TableOfContents\" aria-label=\"%s\">" ("Table of Contents" | htmlEscape)) | safeHTML }}</div>
+    </details>
+    {{- end }}
+
+    <div class="content">
+        {{ .Content }}
+    </div>
+
+    {{- $tags := .GetTerms "tags" }}
+    {{- $share := and ($.Param "ShowShareButtons") (not (.Param "disableShare")) $isPost }}
+    {{- $edit := and site.Params.editPost.URL (not site.Params.editPost.disabled) $isPost }}
+    {{- $nav := and (.Param "ShowPostNavLinks") $isPost }}
+
+    {{- if or $tags $share $edit }}
+    <footer class="postFooter">
+        {{- if or $share $edit }}
+        <div class="postActions">
+            {{- if $share }}{{ partial "share-icons.html" . }}{{ end }}
+            {{- if $edit }}{{ partial "edit-post.html" . }}{{ end }}
+        </div>
+        {{- end }}
+    </footer>
+    {{- end }}
+
+    {{- if $nav }}
+        {{- if or .PrevInSection .NextInSection }}
+            <hr />
+            <nav class="postNav" aria-label="{{ i18n "nav_posts" }}">
+                {{- with .NextInSection }}
+                <a class="postNavLink postNavLink--prev" href="{{ .RelPermalink }}" rel="prev">
+                    {{- partialCached "icon.html" "arrow-left" "arrow-left" }}
+                    <span class="postNavSide">
+                        <span class="postNavLabel">{{ i18n "prev_post" }}</span>
+                        <span class="postNavTitle">{{ .Title }}</span>
+                    </span>
+                </a>
+                {{- end }}
+                {{- with .PrevInSection }}
+                <a class="postNavLink postNavLink--next" href="{{ .RelPermalink }}" rel="next">
+                    <span class="postNavSide">
+                        <span class="postNavLabel">{{ i18n "next_post" }}</span>
+                        <span class="postNavTitle">{{ .Title }}</span>
+                    </span>
+                    {{- partialCached "icon.html" "arrow-right" "arrow-right" }}
+                </a>
+                {{- end }}
+            </nav>
+        {{- end }}   
+    {{ end }}
+
+    {{- if .Param "comments" }}{{ partial "comments.html" . }}{{ end }}
+</article>
+{{ end }}

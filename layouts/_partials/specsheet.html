@@ -1,0 +1,36 @@
+{{- $sections := site.Params.mainSections | default (slice "posts") }}
+    {{- $kind := "" }}
+    {{- $count := 0 }}
+    {{- $label := "" }}
+
+    {{- if eq .Kind "taxonomy" }}
+    {{- $kind = i18n "stamp_index" }}
+    {{- $count = len .Data.Terms }}
+    {{- $label = i18n "subject_count" $count }}
+
+    {{- else if eq .Kind "term" }}
+    {{- $kind = i18n "stamp_subject" }}
+    {{- $count = len .Pages }}
+
+    {{- else if eq .Layout "archives" }}
+    {{- $kind = i18n "stamp_archive" }}
+    {{- $count = len (where site.RegularPages "Type" "in" $sections) }}
+
+    {{- else if eq .Layout "search" }}
+    {{- $kind = i18n "stamp_search" }}
+    {{- $count = len (where site.RegularPages "Params.searchHidden" "!=" true) }}
+    {{- $label = i18n "indexed_count" $count }}
+
+    {{- else if .IsHome }}
+    {{- $kind = "Total Documents Drafted" }}
+    {{- $count = len (where site.RegularPages "Type" "in" $sections) }}
+
+    {{- else }}
+    {{- $kind = " Blog Documents Drafted" }}
+    {{- $count = len .RegularPages }}
+    {{- end }}
+
+    <p class="sheetStamp">
+        <span class="sheetStampKind">{{ $kind }}</span>
+        <span class="sheetStampCount">{{ $count }}</span>
+    </p>

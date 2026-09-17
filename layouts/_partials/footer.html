@@ -1,0 +1,15 @@
+<footer class="footer">
+    <div class="footerInner">
+        <span class="footerIssuer">&copy;2018-{{ now.Year}} {{ .Site.Params.Author.name }}
+        </span>
+        <span class="footerMeta">
+            {{ if .Site.Params.enableRSS }}
+            <a href="/felix/vellum/en/index.xml">RSS</a>
+            <span class="footerSep" aria-hidden="true"></span>
+            {{ end }}
+            <span>
+                Rebuilt from Vellum <i>without</i> AI and powered by  <strike>Wordpress</strike> <a href="https://gohugo.io/" rel="noopener noreferrer" target="_blank">Hugo</a>
+            </span>
+        </span>
+    </div>
+</footer>

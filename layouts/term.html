@@ -1,0 +1,54 @@
+{{ define "main" }}
+<header class="page-header">
+    {{- if and ($.Param "ShowBreadCrumbs") .Ancestors }}
+    {{- partial "breadcrumbs.html" . }}
+    {{- end }}
+    <h1 class="page-title"><span class="page-title__prefix">{{ i18n "tagged_with" }}</span>{{ .Title }}</h1>
+    {{- with .Description }}<p class="page-standfirst">{{ . | markdownify }}</p>{{ end }}
+    {{- partial "specsheet.html" . }}
+</header>
+
+{{- with .Content }}
+<div class="content sheet-note">{{ . }}</div>
+{{- end }}
+
+{{- $paginator := .Paginate .Pages }}
+{{- with $paginator.Pages }}
+    {{- range . }}
+
+    <article class="postCard">
+            <div class="postCardBody">
+                <p class="postCardMeta">
+                    <time class="postCardDate" datetime="{{ .Date.Format "2006-01-02T15:04:05Z07:00" }}" title="{{ .Date }}">{{ .Date | time.Format (site.Params.DateFormat | default ":date_long") }}</time>
+                    <span class="postCardExtent"> / {{ .ReadingTime }} min read.</span>
+                    {{- if .Draft }}
+                    <span class="draft-badge">Draft Copy</span>
+                    {{ end }}
+                    {{ if ne .Lastmod .Date }}
+                        {{ $currentTime := (time now) }}
+                        {{ $delta := $currentTime.Sub (time .Lastmod ) }}
+                        {{ if lt $delta.Hours 730 }}
+                            <span class="new-content">New Article</span>
+                        {{ end }}
+                    {{ else }}
+                        {{ $currentTime := (time now) }}
+                        {{ $delta := $currentTime.Sub (time .Date ) }}
+                        {{ if lt $delta.Hours 730 }}
+                            <span class="new-content">New Article</span>
+                        {{ end }}
+                    {{ end }}
+                </p>
+                <h3 class="postCardTitle"><a href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
+                {{- with .Summary }}
+                <p class="postCardSummary">{{ . | plainify | htmlUnescape | truncate 220 }}</p>
+                {{- end }}
+            </div>
+        </article>    
+    {{- end }}
+
+{{- else }}
+<p class="empty-note">{{ i18n "no_posts" }}</p>
+{{- end }}
+
+{{ partial "pagination.html" $paginator }}
+{{ end }}

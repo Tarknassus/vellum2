@@ -1,0 +1,93 @@
+{{ define "main" }}
+
+<header class="page-header">
+    {{- if and ($.Param "ShowBreadCrumbs") .Ancestors }}
+        {{ partial "breadcrumbs.html" . }}
+    {{- end }}
+    {{ if .IsHome }}
+    {{ else }}
+    <h1 class="page-title">{{ .Title }}</h1>
+    {{ end }}
+    {{- with .Description }}<p class="page-standfirst">{{ . | markdownify }}</p>{{ end }}
+
+
+    {{- $sections := site.Params.mainSections | default (slice "posts") }}
+    {{- $kind := "" }}
+    {{- $count := 0 }}
+    {{- $label := "" }}
+
+    {{- if eq .Kind "taxonomy" }}
+    {{- $kind = i18n "stamp_index" }}
+    {{- $count = len .Data.Terms }}
+    {{- $label = i18n "subject_count" $count }}
+
+    {{- else if eq .Kind "term" }}
+    {{- $kind = i18n "stamp_subject" }}
+    {{- $count = len .Pages }}
+
+    {{- else if eq .Layout "archives" }}
+    {{- $kind = i18n "stamp_archive" }}
+    {{- $count = len (where site.RegularPages "Type" "in" $sections) }}
+
+    {{- else if eq .Layout "search" }}
+    {{- $kind = i18n "stamp_search" }}
+    {{- $count = len (where site.RegularPages "Params.searchHidden" "!=" true) }}
+    {{- $label = i18n "indexed_count" $count }}
+
+    {{- else if .IsHome }}
+    {{- $kind = "Total Documents Drafted" }}
+    {{- $count = len (where site.RegularPages "Type" "in" $sections) }}
+
+    {{- else }}
+    {{- $kind = " Blog Documents Drafted" }}
+    {{- $count = len .RegularPages }}
+    {{- end }}
+
+    <p class="sheetStamp">
+        <span class="sheetStampKind">{{ $kind }}</span>
+        <span class="sheetStampCount">{{ $count }}</span>
+    </p>
+
+</header>
+
+
+{{- with .Content }}
+    <div class="content sheet-note">{{ . }}</div>
+{{- end }}
+
+{{ $pages := where site.RegularPages "Type" "posts" }}
+{{ $paginator := .Paginate $pages.ByDate.Reverse 3 }}
+
+    {{ range $paginator.Pages }}
+        <article class="postCard">
+            <div class="postCardBody">
+                <p class="postCardMeta">
+                    <time class="postCardDate" datetime="{{ .Date.Format "2006-01-02T15:04:05Z07:00" }}" title="{{ .Date }}">{{ .Date | time.Format (site.Params.DateFormat | default ":date_long") }}</time>
+                    <span class="postCardExtent"> / {{ .ReadingTime }} min read.</span>
+                    {{- if .Draft }}
+                    <span class="draft-badge">Draft Copy</span>
+                    {{ end }}
+                    {{ if ne .Lastmod .Date }}
+                        {{ $currentTime := (time now) }}
+                        {{ $delta := $currentTime.Sub (time .Lastmod ) }}
+                        {{ if lt $delta.Hours 730 }}
+                            <span class="new-content">New Article</span>
+                        {{ end }}
+                    {{ else }}
+                        {{ $currentTime := (time now) }}
+                        {{ $delta := $currentTime.Sub (time .Date ) }}
+                        {{ if lt $delta.Hours 730 }}
+                            <span class="new-content">New Article</span>
+                        {{ end }}
+                    {{ end }}
+                </p>
+                <h3 class="postCardTitle"><a href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
+                {{- with .Summary }}
+                <p class="postCardSummary">{{ . | plainify | htmlUnescape | truncate 220 }}</p>
+                {{- end }}
+            </div>
+        </article>    
+    {{ end }}
+
+{{ partial "pagination.html" . }}
+{{ end }}
